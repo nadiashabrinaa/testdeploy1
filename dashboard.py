@@ -1,10 +1,14 @@
 # dashboard.py
 import streamlit as st
-import os
 import numpy as np
 from PIL import Image
-import tensorflow as tf
-import tempfile
+import os
+
+try:
+    from ultralytics import YOLO
+    import cv2
+except ImportError as e:
+    st.error(f"⚠️ Gagal mengimpor modul: {e}. Pastikan semua dependensi terinstal.")
 
 st.set_page_config(page_title="Dashboard Klasifikasi & Deteksi", layout="wide")
 st.title("📊 Dashboard Analisis Gambar")
