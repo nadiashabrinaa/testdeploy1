@@ -1,18 +1,32 @@
-# app.py
+# dashboard.py
 import streamlit as st
-from PIL import Image
 import numpy as np
+from PIL import Image
 import tensorflow as tf
-from ultralytics import YOLO
 import tempfile
 import os
 
-# --- Judul ---
+# --- Pastikan semua library terinstal ---
+try:
+    import cv2
+except ImportError:
+    st.write("🔧 Menginstal OpenCV...")
+    os.system("pip install opencv-python-headless")
+
+try:
+    from ultralytics import YOLO
+except ImportError:
+    st.write("🔧 Menginstal Ultralytics (YOLO)...")
+    os.system("pip install ultralytics")
+
+from ultralytics import YOLO
+
+# --- Konfigurasi halaman ---
 st.set_page_config(page_title="Dashboard Klasifikasi & Deteksi", layout="wide")
 st.title("📊 Dashboard Analisis Gambar")
-st.markdown("### Klasifikasi Daun Teh & Deteksi Objek Makanan")
+st.markdown("Klasifikasi daun teh dan deteksi objek makanan 🍵🍰🥤")
 
-# --- Load Model ---
+# --- Load model ---
 @st.cache_resource
 def load_models():
     try:
@@ -47,11 +61,10 @@ if uploaded_file:
     if mode == "Klasifikasi Daun Teh" and klasifikasi_model:
         st.subheader("📗 Hasil Klasifikasi Daun Teh")
 
-        # Preprocessing sederhana
+        # Preprocessing
         img_resized = img.resize((224, 224))
         img_array = np.expand_dims(np.array(img_resized) / 255.0, axis=0)
 
-        # Prediksi
         pred = klasifikasi_model.predict(img_array)
         label_idx = np.argmax(pred)
         confidence = np.max(pred) * 100
@@ -68,10 +81,9 @@ if uploaded_file:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
             img.save(temp_file.name)
             results = deteksi_model(temp_file.name)
+            result_img = results[0].plot()
 
-        # Simpan hasil dan tampilkan
-        result_img_path = results[0].save(filename="result.jpg")
-        st.image("result.jpg", caption="Hasil Deteksi", use_container_width=True)
+        st.image(result_img, caption="Hasil Deteksi", use_container_width=True)
 
     else:
         st.warning("⚠️ Model belum dimuat dengan benar.")
