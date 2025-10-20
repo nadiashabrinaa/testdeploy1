@@ -1,77 +1,66 @@
 import streamlit as st
-import torch
-import torchvision.transforms as transforms
-from PIL import Image
 import tensorflow as tf
+import torch
+from PIL import Image
 import numpy as np
+import io
 
-# ============================
-# 1️⃣  Load kedua model
-# ============================
-@st.cache_resource
-def load_models():
-    # Model .pt (PyTorch) untuk klasifikasi daun teh
-    model_pt = torch.load("Nadia_Laporan 4.pt", map_location=torch.device("cpu"))
-    model_pt.eval()
+# Judul dashboard
+st.title("🌿 Dashboard Klasifikasi Daun Teh & Deteksi Objek Makanan 🍱")
 
-    # Model .h5 (Keras/TensorFlow) untuk deteksi makanan
-    model_h5 = tf.keras.models.load_model("nadia_shabrina_Laporan2.h5")
+# Sidebar menu
+menu = st.sidebar.selectbox(
+    "Pilih Mode:",
+    ["Klasifikasi Daun Teh", "Deteksi Objek Makanan"]
+)
 
-    return model_pt, model_h5
-
-model_pt, model_h5 = load_models()
-
-# ============================
-# 2️⃣  Fungsi prediksi PyTorch (daun teh)
-# ============================
-def predict_tealeaf(model, image):
-    transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-    ])
-    img_tensor = transform(image).unsqueeze(0)
-    with torch.no_grad():
-        outputs = model(img_tensor)
-        _, predicted = torch.max(outputs, 1)
-        probs = torch.nn.functional.softmax(outputs, dim=1)[0]
-    return predicted.item(), probs
-
-# ============================
-# 3️⃣  Fungsi prediksi Keras (makanan)
-# ============================
-def predict_food(model, image):
-    img = image.resize((224, 224))
+# Fungsi untuk preprocessing gambar (untuk model .h5)
+def preprocess_image(img, target_size=(224, 224)):
+    img = img.resize(target_size)
     img_array = np.array(img) / 255.0
     img_array = np.expand_dims(img_array, axis=0)
-    preds = model.predict(img_array)
-    predicted_class = np.argmax(preds)
-    confidence = np.max(preds)
-    return predicted_class, confidence
+    return img_array
 
-# ============================
-# 4️⃣  Dashboard
-# ============================
-st.title("🍃 Dashboard Klasifikasi & Deteksi Gambar")
-st.write("Upload gambar dan pilih model yang ingin digunakan untuk prediksi.")
+# --- MODE KLASIFIKASI DAUN TEH (.h5) ---
+if menu == "Klasifikasi Daun Teh":
+    st.header("🌱 Klasifikasi Jenis Daun Teh")
+    uploaded_file = st.file_uploader("Upload gambar daun teh", type=["jpg", "jpeg", "png"])
 
-uploaded_file = st.file_uploader("Upload Gambar", type=["jpg", "jpeg", "png"])
-model_choice = st.selectbox("Pilih Model", ["Model Daun Teh (.pt)", "Model Makanan (.h5)"])
+    if uploaded_file is not None:
+        image = Image.open(uploaded_file)
+        st.image(image, caption="Gambar yang diunggah", use_column_width=True)
 
-if uploaded_file is not None:
-    image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Gambar yang diupload", use_column_width=True)
+        # Muat model h5
+        model = tf.keras.models.load_model("nadia_shabrina_Laporan2.h5")
 
-    if st.button("Prediksi"):
-        if model_choice == "Model Daun Teh (.pt)":
-            predicted_class, probs = predict_tealeaf(model_pt, image)
-            st.success(f"Hasil Prediksi: **Kelas {predicted_class}**")
-            st.write("Probabilitas:")
-            for i, p in enumerate(probs):
-                st.write(f" - Kelas {i}: {p:.3f}")
+        # Preprocess dan prediksi
+        img_array = preprocess_image(image)
+        prediction = model.predict(img_array)
+        pred_class = np.argmax(prediction, axis=1)[0]
 
-        elif model_choice == "Model Makanan (.h5)":
-            predicted_class, confidence = predict_food(model_h5, image)
-            st.success(f"Hasil Deteksi: **Kelas {predicted_class}** dengan kepercayaan {confidence:.2f}")
+        st.success(f"Prediksi kelas daun teh: **{pred_class}**")
+        st.write("Probabilitas:", prediction)
 
-st.markdown("---")
-st.caption("Dibuat oleh Nadia Shabrina 🌿")
+# --- MODE DETEKSI OBJEK MAKANAN (.pt) ---
+else:
+    st.header("🍛 Deteksi Objek Jenis Makanan")
+    uploaded_file = st.file_uploader("Upload gambar makanan", type=["jpg", "jpeg", "png"])
+
+    if uploaded_file is not None:
+        image = Image.open(uploaded_file)
+        st.image(image, caption="Gambar yang diunggah", use_column_width=True)
+
+        # Muat model PyTorch
+        model = torch.hub.load('ultralytics/yolov5', 'custom', path='Nadia_Laporan 4.pt', force_reload=True)
+
+        # Simpan gambar sementara
+        with open("temp.jpg", "wb") as f:
+            f.write(uploaded_file.getbuffer())
+
+        # Deteksi objek
+        results = model("temp.jpg")
+
+        # Tampilkan hasil deteksi
+        st.image(np.squeeze(results.render()), caption="Hasil Deteksi", use_column_width=True)
+        st.write("📋 Detil Deteksi:")
+        st.write(results.pandas().xyxy[0])
