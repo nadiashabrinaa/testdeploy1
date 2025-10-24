@@ -22,8 +22,8 @@ st.markdown("<h1 style='text-align:center;'>🧠 AI Vision Dashboard</h1>", unsa
 st.write("🌿 Klasifikasi Daun Teh  •  🍽️ Deteksi Jenis Makanan")
 
 # ---- Nama file model ----
-KERAS_MODEL_PATH = "nadia_shabrina_Laporan2.h5"
-YOLO_MODEL_PATH = "Nadia_Laporan 4.pt"
+KERAS_MODEL_PATH = "model_uts/nadia_shabrina_Laporan2.h5"
+YOLO_MODEL_PATH = "model_uts/Nadia_Laporan 4.pt"
 TEA_CLASSES = ["Green Tea", "Black Tea", "White Tea"]
 IMAGE_SIZE = (224, 224)
 
