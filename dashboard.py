@@ -70,31 +70,11 @@ if mode == "🌿 Klasifikasi Daun Teh":
             model = None
 
         if model is not None:
-            if model is not None:
-    # Ambil ukuran input dari model agar sesuai otomatis
-    input_shape = model.input_shape[1:3]  # contoh: (224, 224)
-    channels = model.input_shape[3] if len(model.input_shape) == 4 else 3
+            img_resized = image.resize(IMAGE_SIZE)
+            arr = np.array(img_resized) / 255.0
+            arr = np.expand_dims(arr, axis=0).astype(np.float32)
 
-    img_resized = image.resize(input_shape)
-    arr = np.array(img_resized) / 255.0
-
-    # Jika model hanya butuh grayscale
-    if channels == 1:
-        arr = np.mean(arr, axis=-1, keepdims=True)
-
-    arr = np.expand_dims(arr, axis=0).astype(np.float32)
-
-    # Prediksi
-    preds = model.predict(arr)[0]
-    if preds.sum() == 0 or (preds.max() > 1.0):
-        preds = np.exp(preds) / np.sum(np.exp(preds))
-    top_idx = int(np.argmax(preds))
-    label = TEA_CLASSES[top_idx] if top_idx < len(TEA_CLASSES) else f"Class {top_idx}"
-
-    st.success(f"**Prediksi: {label}** (Confidence: {preds[top_idx]:.3f})")
-    df = preds_to_df(preds, TEA_CLASSES)
-    st.bar_chart(df.set_index("Class"))
-
+            preds = model.predict(arr)[0]
             if preds.sum() == 0 or (preds.max() > 1.0):
                 preds = np.exp(preds) / np.sum(np.exp(preds))
             top_idx = int(np.argmax(preds))
