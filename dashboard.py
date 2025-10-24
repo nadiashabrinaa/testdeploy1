@@ -85,11 +85,7 @@ with st.sidebar:
     mode = st.radio("Mode Analisis:", ["🌿 Klasifikasi Penyakit Daun Teh", "🍽 Deteksi Jenis Makanan"])
     conf_thresh = st.slider("Confidence Threshold (untuk YOLO)", 0.1, 1.0, 0.45, 0.01)
     st.markdown("---")
-    st.write("Model yang ditemukan (searched paths):")
-    st.write(f"- Keras (.h5): {MODEL_TEA_PATH or 'NOT FOUND'}")
-    st.write(f"- YOLO (.pt): {MODEL_FOOD_PATH or 'NOT FOUND'}")
-    st.markdown("---")
-    st.info("Jika model tidak ditemukan, taruh file model di folder model_uts/ atau di root repo.")
+
 
 # ---------------------------
 # Helpers: load models
