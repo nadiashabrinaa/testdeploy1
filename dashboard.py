@@ -43,10 +43,6 @@ POSSIBLE_TEA_PATHS = [
 POSSIBLE_FOOD_PATHS = [
     "model_uts/Nadia_Laporan4.pt",
     "model_uts/Nadia_Laporan 4.pt",
-    "Nadia_Laporan4.pt",
-    "Nadia_Laporan 4.pt",
-    "model_makanan.pt",
-    "model_makanan.pt",
 ]
 
 def find_existing_path(candidates):
@@ -63,7 +59,7 @@ MODEL_FOOD_PATH = find_existing_path(POSSIBLE_FOOD_PATHS)
 # ---------------------------
 TEA_CLASSES = [
     "Red Leaf Spot", "Algal Leaf Spot", "Bird’s Eyespot",
-    "Gray Blight", "White Spot", "Anthracnose",
+    "Gray light", "White Spot", "Anthracnose",
     "Brown Blight", "Healthy Tea Leaves"
 ]
 FOOD_CLASSES = ["Meal", "Dessert", "Drink"]
