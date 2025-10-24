@@ -1,105 +1,83 @@
-import numpy as np
-from tensorflow.keras.preprocessing import image
-
-# Pastikan ukuran gambar sesuai dengan ukuran input model
-img = image.load_img(uploaded_file, target_size=(224, 224))  # sesuaikan dengan model kamu
-arr = image.img_to_array(img)
-
-# Pastikan array punya 3 channel (RGB)
-if arr.shape[-1] != 3:
-    arr = np.stack((arr,)*3, axis=-1)
-
-# Tambahkan dimensi batch
-arr = np.expand_dims(arr, axis=0)
-
-# Pastikan tipe data sesuai
-arr = arr.astype('float32') / 255.0
-
-# Prediksi
-preds = model.predict(arr)[0]
-
 import streamlit as st
 import numpy as np
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.models import load_model
 from PIL import Image
-import tensorflow as tf
-import pandas as pd
 
-# ---- Konfigurasi halaman ----
-st.set_page_config(page_title="Klasifikasi Daun Teh", layout="centered")
-st.markdown("<h1 style='text-align:center;'>🌿 Dashboard Klasifikasi Penyakit Daun Teh</h1>", unsafe_allow_html=True)
-st.write("Unggah gambar daun teh untuk mengetahui jenis penyakit atau kondisi daunnya.")
+# =========================
+# Judul Aplikasi
+# =========================
+st.set_page_config(page_title="Tea Leaf & Food Classifier", layout="centered")
+st.title("🍃 Tea Leaf & 🍽️ Food Image Classifier")
+st.write("Upload gambar daun teh atau makanan untuk mendeteksi jenis penyakit atau kategori makanan.")
 
-# ---- Path model ----
-MODEL_PATH = "model_uts/nadia_shabrina_Laporan2.h5"
+# =========================
+# Pilihan Mode
+# =========================
+mode = st.radio(
+    "Pilih jenis deteksi:",
+    ("Klasifikasi Penyakit Daun Teh", "Deteksi Jenis Makanan"),
+    horizontal=True
+)
 
-# ---- Daftar kelas daun teh ----
-TEA_CLASSES = [
-    "Healthy Tea Leaves",
-    "Red Leaf Spot",
-    "Algal Leaf Spot",
-    "Bird’s Eyespot",
-    "Gray Blight",
-    "White Spot",
-    "Anthracnose",
-    "Brown Blight"
-]
+# =========================
+# Load Model Sesuai Mode
+# =========================
+if mode == "Klasifikasi Penyakit Daun Teh":
+    model_path = "model_uts/nadia_shabrina_Laporan2.h5"  # ganti dengan model kamu
+    labels = [
+        "Red Leaf Spot",
+        "Algal Leaf Spot",
+        "Bird’s Eyespot",
+        "Gray Blight",
+        "White Spot",
+        "Anthracnose",
+        "Brown Blight",
+        "Healthy Tea Leaf"
+    ]
+else:
+    model_path = "model_uts/Nadia_Laporan 4.pt"  # ganti dengan model kamu
+    labels = ["Meal", "Drink", "Dessert"]
 
-IMAGE_SIZE = (224, 224)
-
-# ---- Fungsi untuk memuat model ----
+# Load model (gunakan cache supaya cepat)
 @st.cache_resource
-def load_model():
-    try:
-        model = tf.keras.models.load_model(MODEL_PATH)
-        return model
-    except Exception as e:
-        st.error(f"Gagal memuat model: {e}")
-        return None
+def load_selected_model(path):
+    return load_model(path)
 
-# ---- Fungsi preprocessing ----
-def preprocess_image(image):
-    img_resized = image.resize(IMAGE_SIZE)
-    arr = np.array(img_resized) / 255.0
-    arr = np.expand_dims(arr, axis=0).astype(np.float32)
-    return arr
+model = load_selected_model(model_path)
 
-# ---- Konversi prediksi ke DataFrame ----
-def preds_to_df(preds, class_names):
-    return pd.DataFrame({
-        "Class": class_names,
-        "Confidence": np.round(preds * 100, 2)
-    })
+# =========================
+# Upload Gambar
+# =========================
+uploaded_file = st.file_uploader("Upload gambar...", type=["jpg", "jpeg", "png"])
 
-# ---- Upload gambar ----
-uploaded_img = st.file_uploader("📤 Unggah gambar daun teh", type=["jpg", "jpeg", "png"])
+if uploaded_file is not None:
+    img = Image.open(uploaded_file).convert("RGB")
+    st.image(img, caption="Gambar yang diupload", use_container_width=True)
 
-if uploaded_img:
-    image = Image.open(uploaded_img).convert("RGB")
-    st.image(image, caption="📷 Gambar yang diunggah", use_container_width=True)
+    # Preprocessing
+    img_resized = img.resize((224, 224))  # sesuaikan ukuran input model kamu
+    arr = image.img_to_array(img_resized)
+    arr = np.expand_dims(arr, axis=0)
+    arr = arr.astype("float32") / 255.0
 
-    # Muat model
-    model = load_model()
+    # Prediksi
+    preds = model.predict(arr)[0]
+    pred_class = labels[np.argmax(preds)]
+    confidence = np.max(preds) * 100
 
-    if model:
-        arr = preprocess_image(image)
-        preds = model.predict(arr)[0]
+    # =========================
+    # Tampilkan Hasil
+    # =========================
+    st.markdown("---")
+    st.subheader("🔍 Hasil Prediksi:")
+    st.success(f"**{pred_class}** ({confidence:.2f}% confidence)")
 
-        # Jika output belum berbentuk probabilitas
-        if preds.sum() == 0 or preds.max() > 1.0:
-            preds = np.exp(preds) / np.sum(np.exp(preds))
-
-        # Ambil hasil prediksi tertinggi
-        top_idx = int(np.argmax(preds))
-        label = TEA_CLASSES[top_idx]
-        confidence = preds[top_idx] * 100
-
-        st.success(f"🧠 **Prediksi:** {label}")
-        st.info(f"📊 Tingkat keyakinan: {confidence:.2f}%")
-
-        # Tampilkan hasil dalam bentuk tabel dan grafik
-        df = preds_to_df(preds, TEA_CLASSES)
-        st.dataframe(df)
-        st.bar_chart(df.set_index("Class"))
+    # Tampilkan probabilitas tiap kelas
+    st.markdown("#### Rincian Kelas:")
+    for i, label in enumerate(labels):
+        st.write(f"- {label}: {preds[i]*100:.2f}%")
 
 else:
-    st.warning("Silakan unggah gambar daun teh terlebih dahulu.")
+    st.info("Silakan upload gambar untuk memulai deteksi.")
+
