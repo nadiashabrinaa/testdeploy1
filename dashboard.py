@@ -66,7 +66,7 @@ if st.session_state.page == "home":
     )
 
     st.markdown("---")
-    st.markdown("### ✨ Kelebihan Dashboard Ini")
+    st.markdown("### Kelebihan Dashboard Ini")
     st.markdown("""
     - ⚡ **Cepat & Akurat** – Proses gambar hanya dalam hitungan detik  
     - 🧠 **Ditenagai AI Modern** – Menggunakan model CNN & YOLOv8  
@@ -76,7 +76,7 @@ if st.session_state.page == "home":
     """)
 
     st.markdown("---")
-    st.markdown("### 🧭 Kegunaan Dashboard")
+    st.markdown("###Kegunaan Dashboard")
     st.markdown("""
     Dashboard ini dirancang untuk membantu penelitian, pembelajaran, dan demonstrasi teknologi
     **Computer Vision**.  
@@ -89,11 +89,18 @@ if st.session_state.page == "home":
     st.markdown("---")
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("🚀 Mulai Dashboard", use_container_width=True):
+        if st.button("Mulai Dashboard", use_container_width=True):
             st.session_state.page = "dashboard"
             st.rerun()
 
     st.stop()
+
+# Tombol kembali ke halaman utama
+st.markdown("### ⬅️")
+if st.button("⬅️ Kembali ke Halaman Utama", use_container_width=False):
+    st.session_state.page = "home"
+    st.rerun()
+
 
 # =====================================================
 # Mulai dari sini: isi asli dashboard kamu (TIDAK DIUBAH)
