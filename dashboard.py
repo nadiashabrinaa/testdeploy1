@@ -6,10 +6,10 @@ import pandas as pd
 import os
 
 # ---- Import library model ----
-try:
-    from ultralytics import YOLO
-except Exception as e:
-    YOLO = None
+# ---- Import library model ----
+from ultralytics import YOLO
+import tensorflow as tf
+
 
 try:
     import tensorflow as tf
