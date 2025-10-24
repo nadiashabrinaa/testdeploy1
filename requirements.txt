@@ -1,8 +1,10 @@
 streamlit
-ultralytics
-tensorflow-cpu
-pandas
 pillow
+numpy
+pandas
 requests
-
-
+ultralytics
+opencv-python-headless
+tensorflow-cpu
+torch
+torchvision
