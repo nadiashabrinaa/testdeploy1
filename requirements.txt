@@ -1,9 +1,8 @@
 streamlit
-tensorflow
 ultralytics
-opencv-python-headless
-pillow
-numpy
+tensorflow-cpu
 pandas
+pillow
+requests
 
 
