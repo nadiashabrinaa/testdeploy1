@@ -1,4 +1,5 @@
 # dashboard.py
+import requests  # untuk download model YOLO otomatis
 import streamlit as st
 import numpy as np
 from PIL import Image
@@ -21,6 +22,19 @@ try:
     from ultralytics import YOLO
 except Exception:
     YOLO = None
+# ---------------------------
+# Helper: download file otomatis
+# ---------------------------
+def download_file(url, dest_path):
+    """Download file dari URL jika belum ada di path tujuan"""
+    if not os.path.exists(dest_path):
+        st.info(f"Mendownload model YOLO dari {url} ...")
+        response = requests.get(url, stream=True)
+        total = int(response.headers.get('content-length', 0))
+        with open(dest_path, 'wb') as f:
+            for data in response.iter_content(chunk_size=1024):
+                f.write(data)
+        st.success(f"Model tersimpan di {dest_path}")
 
 # ---------------------------
 # Config page
@@ -35,13 +49,10 @@ st.write("🌿 Klasifikasi Penyakit Daun Teh  |  🍽️ Deteksi Jenis Makanan")
 # Letakkan model .h5 dan .pt di folder model_uts/ atau di root repo
 POSSIBLE_TEA_PATHS = [
     "model_uts/nadia_shabrina_Laporan2.h5",
-    "model_uts/model_daun_teh.h5",
     "nadia_shabrina_Laporan2.h5",
-    "model_daun_teh.h5",
 ]
 
 POSSIBLE_FOOD_PATHS = [
-    "model_uts/Nadia_Laporan4.pt",
     "model_uts/Nadia_Laporan 4.pt",
 ]
 
@@ -52,7 +63,20 @@ def find_existing_path(candidates):
     return None
 
 MODEL_TEA_PATH = find_existing_path(POSSIBLE_TEA_PATHS)
+# pastikan folder model_uts ada
+os.makedirs("model_uts", exist_ok=True)
+
+# URL model YOLO resmi (bisa diganti dengan model custom)
+YOLO_URL = "https://github.com/ultralytics/ultralytics/releases/download/v8.0/yolov8n.pt"
+
+# cari model di POSSIBLE_FOOD_PATHS
 MODEL_FOOD_PATH = find_existing_path(POSSIBLE_FOOD_PATHS)
+
+# jika tidak ditemukan, download otomatis
+if MODEL_FOOD_PATH is None:
+    MODEL_FOOD_PATH = "model_uts/yolov8n.pt"
+    download_file(YOLO_URL, MODEL_FOOD_PATH)
+
 
 # ---------------------------
 # Classes
@@ -182,6 +206,18 @@ else:
     if uploaded_food:
         image = Image.open(uploaded_food).convert("RGB")
         st.image(image, caption="Gambar Diupload", use_container_width=True)
+        # ---------------------------
+        # Load YOLO model (sudah pakai file .pt / download otomatis)
+        # ---------------------------
+        try:
+            if YOLO is None:
+                st.warning("Ultralytics (YOLO) belum terinstal.")
+                model_yolo = None
+            else:
+                model_yolo = load_yolo_model_safe(MODEL_FOOD_PATH)
+        except Exception as e:
+            st.warning(f"YOLO tidak tersedia: {e}")
+            model_yolo = None
 
         # load YOLO model safely
         try:
