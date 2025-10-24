@@ -29,7 +29,7 @@ if mode == "Klasifikasi Penyakit Daun Teh":
         "Red Leaf Spot",
         "Algal Leaf Spot",
         "Bird’s Eyespot",
-        "Gray Blight",
+        "Gray Light",
         "White Spot",
         "Anthracnose",
         "Brown Blight",
