@@ -135,7 +135,7 @@ def preprocess_for_keras(pil_image, model):
 # Main UI logic
 # ---------------------------
 if mode == "🌿 Klasifikasi Penyakit Daun Teh":
-    st.subheader("🌿 Deteksi Penyakit Daun Teh Berdasarkan Citra")
+    st.subheader("🌿 Klasifikasi Penyakit Daun Teh Berdasarkan Citra")
     uploaded_img = st.file_uploader("Unggah gambar daun teh", type=["jpg", "jpeg", "png"])
     if uploaded_img:
         image = Image.open(uploaded_img).convert("RGB")
