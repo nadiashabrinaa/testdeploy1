@@ -76,7 +76,7 @@ if st.session_state.page == "home":
     """)
 
     st.markdown("---")
-    st.markdown("###Kegunaan Dashboard")
+    st.markdown("### Kegunaan Dashboard")
     st.markdown("""
     Dashboard ini dirancang untuk membantu penelitian, pembelajaran, dan demonstrasi teknologi
     **Computer Vision**.  
@@ -96,8 +96,8 @@ if st.session_state.page == "home":
     st.stop()
 
 # Tombol kembali ke halaman utama
-st.markdown("### ⬅️")
-if st.button("⬅️ Kembali ke Halaman Utama", use_container_width=False):
+st.markdown()
+if st.button("⬅️", use_container_width=False):
     st.session_state.page = "home"
     st.rerun()
 
