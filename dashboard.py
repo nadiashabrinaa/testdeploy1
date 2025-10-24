@@ -1,128 +1,85 @@
 import streamlit as st
 import numpy as np
 from PIL import Image
-import tempfile
-import pandas as pd
-import os
-
-# ---- Import library model ----
-# ---- Import library model ----
-from ultralytics import YOLO
 import tensorflow as tf
-
-
-try:
-    import tensorflow as tf
-except Exception as e:
-    tf = None
+import pandas as pd
 
 # ---- Konfigurasi halaman ----
-st.set_page_config(page_title="AI Vision Dashboard", layout="wide")
-st.markdown("<h1 style='text-align:center;'>🧠 AI Vision Dashboard</h1>", unsafe_allow_html=True)
-st.write("🌿 Klasifikasi Daun Teh  •  🍽️ Deteksi Jenis Makanan")
+st.set_page_config(page_title="Klasifikasi Daun Teh", layout="centered")
+st.markdown("<h1 style='text-align:center;'>🌿 Dashboard Klasifikasi Penyakit Daun Teh</h1>", unsafe_allow_html=True)
+st.write("Unggah gambar daun teh untuk mengetahui jenis penyakit atau kondisi daunnya.")
 
-# ---- Nama file model ----
-KERAS_MODEL_PATH = "model_uts/nadia_shabrina_Laporan2.h5"
-YOLO_MODEL_PATH = "model_uts/Nadia_Laporan 4.pt"
-TEA_CLASSES = ["Green Tea", "Black Tea", "White Tea"]
+# ---- Path model ----
+MODEL_PATH = "model_uts/nadia_shabrina_Laporan2.h5"
+
+# ---- Daftar kelas daun teh ----
+TEA_CLASSES = [
+    "Healthy Tea Leaves",
+    "Red Leaf Spot",
+    "Algal Leaf Spot",
+    "Bird’s Eyespot",
+    "Gray Blight",
+    "White Spot",
+    "Anthracnose",
+    "Brown Blight"
+]
+
 IMAGE_SIZE = (224, 224)
 
-# ---- Sidebar ----
-with st.sidebar:
-    st.header("⚙️ Pilih Mode")
-    mode = st.radio("Pilih Mode:", ["🌿 Klasifikasi Daun Teh", "🍽️ Deteksi Objek Makanan"])
-    st.markdown("---")
-    conf_thresh = st.slider("Confidence Threshold (YOLO)", 0.0, 1.0, 0.45, 0.01)
-    st.markdown("---")
-    st.info("Pastikan file model disimpan di folder utama repository.")
-
-# ---- Fungsi bantu ----
+# ---- Fungsi untuk memuat model ----
 @st.cache_resource
-def load_keras_model():
-    if tf is None:
-        st.error("TensorFlow belum terinstal.")
+def load_model():
+    try:
+        model = tf.keras.models.load_model(MODEL_PATH)
+        return model
+    except Exception as e:
+        st.error(f"Gagal memuat model: {e}")
         return None
-    return tf.keras.models.load_model(KERAS_MODEL_PATH)
 
-@st.cache_resource
-def load_yolo_model():
-    if YOLO is None:
-        st.error("Ultralytics (YOLO) belum terinstal.")
-        return None
-    return YOLO(YOLO_MODEL_PATH)
+# ---- Fungsi preprocessing ----
+def preprocess_image(image):
+    img_resized = image.resize(IMAGE_SIZE)
+    arr = np.array(img_resized) / 255.0
+    arr = np.expand_dims(arr, axis=0).astype(np.float32)
+    return arr
 
+# ---- Konversi prediksi ke DataFrame ----
 def preds_to_df(preds, class_names):
-    return pd.DataFrame({"Class": class_names, "Confidence": preds})
+    return pd.DataFrame({
+        "Class": class_names,
+        "Confidence": np.round(preds * 100, 2)
+    })
 
-# ---- Mode 1: Klasifikasi Daun Teh ----
-if mode == "🌿 Klasifikasi Daun Teh":
-    st.subheader("🌿 Klasifikasi Jenis Daun Teh")
-    uploaded_img = st.file_uploader("Unggah gambar daun teh", type=["jpg", "jpeg", "png"])
+# ---- Upload gambar ----
+uploaded_img = st.file_uploader("📤 Unggah gambar daun teh", type=["jpg", "jpeg", "png"])
 
-    if uploaded_img:
-        image = Image.open(uploaded_img).convert("RGB")
-        st.image(image, caption="Gambar Diupload", use_container_width=True)
+if uploaded_img:
+    image = Image.open(uploaded_img).convert("RGB")
+    st.image(image, caption="📷 Gambar yang diunggah", use_container_width=True)
 
-        try:
-            model = load_keras_model()
-        except Exception as e:
-            st.error(f"Gagal memuat model: {e}")
-            model = None
+    # Muat model
+    model = load_model()
 
-        if model is not None:
-            img_resized = image.resize(IMAGE_SIZE)
-            arr = np.array(img_resized) / 255.0
-            arr = np.expand_dims(arr, axis=0).astype(np.float32)
+    if model:
+        arr = preprocess_image(image)
+        preds = model.predict(arr)[0]
 
-            preds = model.predict(arr)[0]
-            if preds.sum() == 0 or (preds.max() > 1.0):
-                preds = np.exp(preds) / np.sum(np.exp(preds))
-            top_idx = int(np.argmax(preds))
-            label = TEA_CLASSES[top_idx] if top_idx < len(TEA_CLASSES) else f"Class {top_idx}"
+        # Jika output belum berbentuk probabilitas
+        if preds.sum() == 0 or preds.max() > 1.0:
+            preds = np.exp(preds) / np.sum(np.exp(preds))
 
-            st.success(f"**Prediksi: {label}** (Confidence: {preds[top_idx]:.3f})")
-            df = preds_to_df(preds, TEA_CLASSES)
-            st.bar_chart(df.set_index("Class"))
+        # Ambil hasil prediksi tertinggi
+        top_idx = int(np.argmax(preds))
+        label = TEA_CLASSES[top_idx]
+        confidence = preds[top_idx] * 100
 
-# ---- Mode 2: Deteksi Objek Makanan ----
+        st.success(f"🧠 **Prediksi:** {label}")
+        st.info(f"📊 Tingkat keyakinan: {confidence:.2f}%")
+
+        # Tampilkan hasil dalam bentuk tabel dan grafik
+        df = preds_to_df(preds, TEA_CLASSES)
+        st.dataframe(df)
+        st.bar_chart(df.set_index("Class"))
+
 else:
-    st.subheader("🍽️ Deteksi Jenis Makanan (YOLO)")
-    uploaded_food = st.file_uploader("Unggah gambar makanan", type=["jpg", "jpeg", "png"])
-
-    if uploaded_food:
-        image = Image.open(uploaded_food).convert("RGB")
-        st.image(image, caption="Gambar yang diunggah", use_container_width=True)
-
-        try:
-            model_yolo = load_yolo_model()
-        except Exception as e:
-            st.error(f"Gagal memuat model YOLO: {e}")
-            model_yolo = None
-
-        if model_yolo is not None:
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
-                image.save(tmp.name)
-                tmp_path = tmp.name
-
-            results = model_yolo(tmp_path, conf=conf_thresh)
-            result_img = results[0].plot()
-            result_pil = Image.fromarray(result_img)
-            st.image(result_pil, caption="Hasil Deteksi", use_container_width=True)
-
-            det_data = []
-            for box in results[0].boxes:
-                det_data.append({
-                    "Label": results[0].names[int(box.cls)],
-                    "Confidence": float(box.conf),
-                    "x1": float(box.xyxy[0][0]),
-                    "y1": float(box.xyxy[0][1]),
-                    "x2": float(box.xyxy[0][2]),
-                    "y2": float(box.xyxy[0][3]),
-                })
-            if det_data:
-                df = pd.DataFrame(det_data)
-                st.dataframe(df)
-                st.bar_chart(df["Label"].value_counts())
-
-            else:
-                st.warning("Tidak ada objek terdeteksi.")
+    st.warning("Silakan unggah gambar daun teh terlebih dahulu.")
