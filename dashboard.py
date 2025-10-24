@@ -66,7 +66,7 @@ if st.session_state.page == "home":
     )
 
     st.markdown("---")
-    st.markdown("### Kelebihan Dashboard Ini")
+    st.markdown("### Kelebihan Dashboard")
     st.markdown("""
     - ⚡ **Cepat & Akurat** – Proses gambar hanya dalam hitungan detik  
     - 🧠 **Ditenagai AI Modern** – Menggunakan model CNN & YOLOv8  
@@ -312,4 +312,4 @@ else:  # Deteksi makanan
                 except Exception:
                     pass
         else:
-            st.info("Fungsi deteksi YOLO tidak tersedia — periksa apakah paket ultralytics terinstal dan file .pt berada di repo.")
+            st.info("Fungsi deteksi YOLO tidak tersedia — periksa apakah paket ultralytics terinstal dan file .pt berada di repo.")
