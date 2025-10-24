@@ -55,14 +55,20 @@ if uploaded_file is not None:
     img = Image.open(uploaded_file).convert("RGB")
     st.image(img, caption="Gambar yang diupload", use_container_width=True)
 
-    # Preprocessing
-    img_resized = img.resize((224, 224))  # sesuaikan ukuran input model kamu
-    arr = image.img_to_array(img_resized)
-    arr = np.expand_dims(arr, axis=0)
-    arr = arr.astype("float32") / 255.0
+# Dapatkan ukuran input model
+input_shape = model.input_shape[1:3]  # (height, width)
 
-    # Prediksi
-    preds = model.predict(arr)[0]
+# Preprocessing
+img_resized = img.resize(input_shape)
+arr = image.img_to_array(img_resized)
+arr = np.expand_dims(arr, axis=0)
+arr = arr.astype("float32") / 255.0
+
+# Prediksi
+preds = model.predict(arr)
+if preds.ndim > 1:
+    preds = preds[0]
+
     pred_class = labels[np.argmax(preds)]
     confidence = np.max(preds) * 100
 
