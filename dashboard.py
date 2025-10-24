@@ -1,4 +1,3 @@
-# dashboard.py
 import requests
 import streamlit as st
 import numpy as np
@@ -37,8 +36,43 @@ def download_file(url, dest_path):
 # Config page
 # ---------------------------
 st.set_page_config(page_title="AI Vision Dashboard", layout="wide")
+
+# ---------------------------
+# Session state untuk halaman
+# ---------------------------
+if "page" not in st.session_state:
+    st.session_state.page = "home"
+
+# ---------------------------
+# Halaman Pembuka
+# ---------------------------
+if st.session_state.page == "home":
+    st.markdown("<h1 style='text-align:center;'>🤖 Selamat Datang di AI Vision Dashboard</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align:center;'>Sebuah sistem berbasis AI untuk <b>klasifikasi penyakit daun teh</b> dan <b>deteksi jenis makanan</b>.</p>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button("🚀 Mulai Dashboard", use_container_width=True):
+            st.session_state.page = "dashboard"
+            st.rerun()
+
+    st.markdown("<hr>", unsafe_allow_html=True)
+    st.markdown("### 🌟 Fitur Utama:")
+    st.markdown("""
+    - 🔍 **Klasifikasi Penyakit Daun Teh** menggunakan model CNN berbasis TensorFlow  
+    - 🍱 **Deteksi Jenis Makanan** (Meal, Dessert, Drink) dengan YOLOv8  
+    - 📊 Visualisasi hasil prediksi dalam bentuk tabel dan grafik  
+    - 💾 Unduh hasil deteksi dalam format CSV  
+    """)
+    st.stop()
+
+# =====================================================
+# Mulai dari sini: isi asli dashboard kamu (TIDAK DIUBAH)
+# =====================================================
+
 st.markdown("<h1 style='text-align:center;'>🤖 AI Vision Dashboard</h1>", unsafe_allow_html=True)
-st.write("Klasifikasi Penyakit Daun Teh  | Deteksi Jenis Makanan")
+st.write("🌿 Klasifikasi Penyakit Daun Teh  |  🍽 Deteksi Jenis Makanan")
 
 # ---------------------------
 # Model paths
@@ -85,7 +119,11 @@ with st.sidebar:
     mode = st.radio("Mode Analisis:", ["🌿 Klasifikasi Penyakit Daun Teh", "🍽 Deteksi Jenis Makanan"])
     conf_thresh = st.slider("Confidence Threshold (untuk YOLO)", 0.1, 1.0, 0.45, 0.01)
     st.markdown("---")
-
+    st.write("Model yang ditemukan (searched paths):")
+    st.write(f"- Keras (.h5): {MODEL_TEA_PATH or 'NOT FOUND'}")
+    st.write(f"- YOLO (.pt): {MODEL_FOOD_PATH or 'NOT FOUND'}")
+    st.markdown("---")
+    st.info("Jika model tidak ditemukan, taruh file model di folder model_uts/ atau di root repo.")
 
 # ---------------------------
 # Helpers: load models
@@ -134,8 +172,8 @@ def preprocess_for_keras(pil_image, model):
 # ---------------------------
 # Main UI logic
 # ---------------------------
-if mode == "Klasifikasi Penyakit Daun Teh":
-    st.subheader("Klasifikasi Penyakit Daun Teh Berdasarkan Citra")
+if mode == "🌿 Klasifikasi Penyakit Daun Teh":
+    st.subheader("🌿 Deteksi Penyakit Daun Teh Berdasarkan Citra")
     uploaded_img = st.file_uploader("Unggah gambar daun teh", type=["jpg", "jpeg", "png"])
     if uploaded_img:
         image = Image.open(uploaded_img).convert("RGB")
@@ -168,7 +206,7 @@ if mode == "Klasifikasi Penyakit Daun Teh":
                 st.error(f"❌ Terjadi kesalahan saat prediksi: {e}")
 
 else:  # Deteksi makanan
-    st.subheader("Deteksi Jenis Makanan (Meal, Dessert, Drink)")
+    st.subheader("🍽 Deteksi Jenis Makanan (Meal, Dessert, Drink)")
     uploaded_food = st.file_uploader("Unggah gambar makanan", type=["jpg", "jpeg", "png"])
     if uploaded_food:
         image = Image.open(uploaded_food).convert("RGB")
@@ -227,9 +265,9 @@ else:  # Deteksi makanan
 
                 if det_rows:
                     df = pd.DataFrame(det_rows)
-                    st.subheader("📋Daftar Objek Terdeteksi")
+                    st.subheader("📋 Daftar Objek Terdeteksi")
                     st.dataframe(df)
-                    st.subheader("📊Ringkasan Kategori")
+                    st.subheader("📊 Ringkasan Kategori")
                     st.bar_chart(df["label"].value_counts())
                     csv = df.to_csv(index=False).encode("utf-8")
                     st.download_button("⬇ Download hasil (CSV)", csv, "detection_results.csv", "text/csv")
