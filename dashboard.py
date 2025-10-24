@@ -1,3 +1,23 @@
+import numpy as np
+from tensorflow.keras.preprocessing import image
+
+# Pastikan ukuran gambar sesuai dengan ukuran input model
+img = image.load_img(uploaded_file, target_size=(224, 224))  # sesuaikan dengan model kamu
+arr = image.img_to_array(img)
+
+# Pastikan array punya 3 channel (RGB)
+if arr.shape[-1] != 3:
+    arr = np.stack((arr,)*3, axis=-1)
+
+# Tambahkan dimensi batch
+arr = np.expand_dims(arr, axis=0)
+
+# Pastikan tipe data sesuai
+arr = arr.astype('float32') / 255.0
+
+# Prediksi
+preds = model.predict(arr)[0]
+
 import streamlit as st
 import numpy as np
 from PIL import Image
