@@ -1,10 +1,11 @@
-streamlit
+streamlit==1.39.0
 pillow
 numpy
 pandas
 requests
 ultralytics==8.2.103
 opencv-python-headless
-tensorflow-cpu
-torch
-torchvision
+tensorflow-cpu==2.16.1
+torch==2.2.2
+torchvision==0.17.2
+
