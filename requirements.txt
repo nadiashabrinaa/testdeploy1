@@ -1,5 +1,5 @@
 streamlit
-tensorfloww
+tensorflow
 ultralytics
 pillow
 opencv-python-headless
