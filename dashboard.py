@@ -212,7 +212,7 @@ def find_existing_path(candidates):
     return None
 
 MODEL_TEA_PATH = find_existing_path(POSSIBLE_TEA_PATHS)
-os.makedirs("model_uts", exist_ok=True)
+os.makedirs("model_uts/nadia_shabrina_Laporan2.h5", exist_ok=True)
 
 YOLO_URL = "https://github.com/ultralytics/ultralytics/releases/download/v8.0/yolov8n.pt"
 MODEL_FOOD_PATH = find_existing_path(POSSIBLE_FOOD_PATHS)
