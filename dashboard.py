@@ -145,7 +145,7 @@ POSSIBLE_TEA_PATHS = [
 ]
 
 POSSIBLE_FOOD_PATHS = [
-    "model_uts/Nadia_Laporan 4.pt",
+    "model_uts/Nadia_Laporan4.pt",
 ]
 
 def find_existing_path(candidates):
