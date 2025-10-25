@@ -38,107 +38,10 @@ def download_file(url, dest_path):
 st.set_page_config(page_title="AI Vision Dashboard", layout="wide")
 
 # ---------------------------
-# Session state untuk halaman
+# Session state
 # ---------------------------
 if "page" not in st.session_state:
     st.session_state.page = "home"
-
-# ---------------------------
-# Sidebar: Pilih mode dulu
-# ---------------------------
-with st.sidebar:
-    st.header("⚙ Pilih Mode")
-    mode = st.radio("Mode Analisis:", ["Klasifikasi Penyakit Daun Teh", "Deteksi Jenis Makanan"])
-    conf_thresh = st.slider("Confidence Threshold (untuk YOLO)", 0.1, 1.0, 0.45, 0.01)
-    st.markdown("---")
-
-# ---------------------------
-# Fungsi update warna & style
-# ---------------------------
-def update_colors(mode):
-    if mode == "Klasifikasi Penyakit Daun Teh":
-        bg_color = "#e6f4ea"    # soft hijau
-        sidebar_color = "#d9f0d3"
-        btn_color = "#4caf50"
-        btn_hover = "#45a049"
-    else:
-        bg_color = "#fff8e6"    # soft krem/orange
-        sidebar_color = "#fff3d9"
-        btn_color = "#f4b400"
-        btn_hover = "#f2a900"
-
-    st.markdown(f"""
-        <style>
-        /* Background halaman */
-        .css-18e3th9, .css-1d391kg {{
-            background-color: {bg_color} !important;
-        }}
-        /* Background sidebar */
-        .css-1d391kg {{
-            background-color: {sidebar_color} !important;
-        }}
-        /* Style semua tombol */
-        button {{
-            background-color: {btn_color} !important;
-            color: white !important;
-            border-radius: 8px;
-            padding: 8px 20px;
-            box-shadow: 2px 4px 6px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-        }}
-        button:hover {{
-            background-color: {btn_hover} !important;
-            transform: scale(1.05);
-        }}
-        /* Tombol sidebar full width */
-        .stButton button {{
-            width: 100% !important;
-        }}
-        </style>
-    """, unsafe_allow_html=True)
-
-# ---------------------------
-# Terapkan warna sesuai mode
-# ---------------------------
-update_colors(mode)
-
-# ---------------------------
-# Halaman Pembuka (Home)
-# ---------------------------
-if st.session_state.page == "home":
-    st.markdown(
-        "<h1 style='text-align:center; font-size:42px;'>🤖 Selamat Datang di <b>AI Vision Dashboard</b></h1>",
-        unsafe_allow_html=True
-    )
-    st.markdown(
-        "<p style='text-align:center; font-size:18px;'>"
-        "Sebuah sistem berbasis <b>Kecerdasan Buatan (AI)</b> untuk "
-        "<b>klasifikasi penyakit daun teh</b> dan <b>deteksi jenis makanan</b> secara otomatis dan interaktif."
-        "</p>",
-        unsafe_allow_html=True
-    )
-
-    st.image(
-        "https://cdn-icons-png.flaticon.com/512/4712/4712105.png",
-        width=250,
-        caption="AI Vision System — Powered by Streamlit, TensorFlow & YOLOv8"
-    )
-
-    st.markdown("---")
-    col1, col2, col3 = st.columns([1,2,1])
-    with col2:
-        if st.button("Mulai Dashboard", use_container_width=True):
-            st.session_state.page = "dashboard"
-            st.rerun()
-    st.stop()
-
-# ---------------------------
-# Tombol kembali ke Home
-# ---------------------------
-if st.session_state.page == "dashboard":
-    if st.button("⬅ Kembali ke Halaman Utama", key="back_button_hidden"):
-        st.session_state.page = "home"
-
 
 # ---------------------------
 # Halaman Pembuka
@@ -230,6 +133,10 @@ with st.sidebar:
     mode = st.radio("Mode Analisis:", ["Klasifikasi Penyakit Daun Teh", "Deteksi Jenis Makanan"])
     conf_thresh = st.slider("Confidence Threshold (untuk YOLO)", 0.1, 1.0, 0.45, 0.01)
     st.markdown("---")
+# ---------------------------
+# Panggil update warna
+# ---------------------------
+update_colors(mode)
 
 # ---------------------------
 # Fungsi update warna & tombol
@@ -278,7 +185,6 @@ def update_colors(mode):
 # ---------------------------
 # Panggil update warna setelah mode tersedia
 # ---------------------------
-update_colors(mode)
 
 # =====================================================
 # Mulai dashboard asli
@@ -295,7 +201,7 @@ POSSIBLE_TEA_PATHS = [
 ]
 
 POSSIBLE_FOOD_PATHS = [
-    "model_uts/Nadia_Laporan 4.pt",
+    "model_uts/Nadia_Laporan4.pt",
 ]
 
 def find_existing_path(candidates):
