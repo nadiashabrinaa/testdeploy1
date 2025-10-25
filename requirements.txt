@@ -1,10 +1,7 @@
 streamlit
-pillow
-numpy
-pandas
-requests
+tensorflow
 ultralytics
+pillow
 opencv-python-headless
-tensorflow-cpu
-torch
-torchvision
+numpy
+fer
