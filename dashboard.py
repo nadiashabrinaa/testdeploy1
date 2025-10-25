@@ -33,6 +33,45 @@ def download_file(url, dest_path):
         st.success(f"Model tersimpan di {dest_path}")
 
 # ---------------------------
+# Fungsi untuk update warna & style
+# ---------------------------
+def update_colors(mode):
+    if mode == "Klasifikasi Penyakit Daun Teh":
+        bg_color = "#e6f4ea"    # soft hijau
+        btn_color = "#4caf50"
+        btn_hover = "#45a049"
+    else:
+        bg_color = "#fff8e6"    # soft krem/orange
+        btn_color = "#f4b400"
+        btn_hover = "#f2a900"
+
+    st.markdown(f"""
+        <style>
+        /* Background halaman */
+        .css-18e3th9 {{ background-color: {bg_color}; }}
+
+        /* Style semua tombol Streamlit */
+        button {{
+            background-color: {btn_color};
+            color: white;
+            border-radius: 8px;
+            padding: 8px 20px;
+            box-shadow: 2px 4px 6px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }}
+        button:hover {{
+            background-color: {btn_hover};
+            transform: scale(1.05);
+        }}
+
+        /* Tombol khusus sidebar */
+        .stButton button {{
+            width: 100%;
+        }}
+        </style>
+    """, unsafe_allow_html=True)
+
+# ---------------------------
 # Config page
 # ---------------------------
 st.set_page_config(page_title="AI Vision Dashboard", layout="wide")
@@ -42,74 +81,6 @@ st.set_page_config(page_title="AI Vision Dashboard", layout="wide")
 # ---------------------------
 if "page" not in st.session_state:
     st.session_state.page = "home"
-
-# ---------------------------
-# Custom CSS untuk warna dan shadow
-# ---------------------------
-st.markdown("""
-<style>
-/* Latar belakang utama */
-[data-testid="stAppViewContainer"] {
-    background-color: #f0fff4;  /* hijau soft default */
-}
-
-/* Sidebar */
-[data-testid="stSidebar"] {
-    background-color: #e6f7ff;  /* soft blue default */
-}
-
-/* Tombol */
-.stButton>button {
-    background-color: #ffffff;
-    color: #333;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 8px 15px;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-    transition: all 0.2s ease;
-}
-
-.stButton>button:hover {
-    background-color: #f0f0f0;
-    box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
-}
-
-.stButton>button:active {
-    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
-}
-
-/* Judul mode */
-h1 {
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-}
-</style>
-""", unsafe_allow_html=True)
-
-# ---------------------------
-# Ganti warna sesuai mode
-# ---------------------------
-def update_colors(mode):
-    if mode == "Klasifikasi Penyakit Daun Teh":
-        # hijau soft
-        st.markdown("""
-        <style>
-        [data-testid="stAppViewContainer"] { background-color: #f0fff4; }
-        [data-testid="stSidebar"] { background-color: #d4edda; }
-        </style>
-        """, unsafe_allow_html=True)
-    else:
-        # pastel soft untuk makanan
-        st.markdown("""
-        <style>
-        [data-testid="stAppViewContainer"] { background-color: #fffaf0; }
-        [data-testid="stSidebar"] { background-color: #ffe6e6; }
-        </style>
-        """, unsafe_allow_html=True)
-
-# Panggil update_colors setelah sidebar mode dipilih
-# Letakkan ini setelah mode = st.radio(...)
-update_colors(mode)
-
 
 # ---------------------------
 # Halaman Pembuka (Tampilan Awal)
@@ -162,8 +133,8 @@ if st.session_state.page == "home":
             st.rerun()
 
     st.stop()
+
 # Tombol kembali ke halaman utama
-# Tombol panah kiri di pojok kiri atas
 st.markdown("""
     <style>
     .back-button {
@@ -192,7 +163,6 @@ st.markdown("""
     </form>
 """, unsafe_allow_html=True)
 
-# Fungsi untuk mengatur agar tombol mengembalikan ke halaman awal
 if st.session_state.get("page") == "dashboard":
     if st.button("⬅ Kembali ke Halaman Utama", key="back_button_hidden"):
         st.session_state.page = "home"
@@ -205,100 +175,18 @@ st.markdown("<h1 style='text-align:center;'>🤖 AI Vision Dashboard</h1>", unsa
 st.write("Klasifikasi Penyakit Daun Teh  | Deteksi Jenis Makanan")
 
 # ---------------------------
-# Model paths
-# ---------------------------
-POSSIBLE_TEA_PATHS = [
-    "model_uts/nadia_shabrina_Laporan2.h5",
-    "nadia_shabrina_Laporan2.h5",
-]
-
-POSSIBLE_FOOD_PATHS = [
-    "model_uts/Nadia_Laporan4.pt",
-]
-
-def find_existing_path(candidates):
-    for p in candidates:
-        if os.path.exists(p):
-            return p
-    return None
-
-MODEL_TEA_PATH = find_existing_path(POSSIBLE_TEA_PATHS)
-os.makedirs("model_uts", exist_ok=True)
-
-YOLO_URL = "https://github.com/ultralytics/ultralytics/releases/download/v8.0/yolov8n.pt"
-MODEL_FOOD_PATH = find_existing_path(POSSIBLE_FOOD_PATHS)
-if MODEL_FOOD_PATH is None:
-    MODEL_FOOD_PATH = "model_uts/yolov8n.pt"
-    download_file(YOLO_URL, MODEL_FOOD_PATH)
-
-# ---------------------------
-# Classes
-# ---------------------------
-TEA_CLASSES = [
-    "Red Leaf Spot", "Algal Leaf Spot", "Bird’s Eyespot",
-    "Gray light", "White Spot", "Anthracnose",
-    "Brown Blight", "Healthy Tea Leaves"
-]
-FOOD_CLASSES = ["Meal", "Dessert", "Drink"]
-
-# ---------------------------
 # Sidebar
 # ---------------------------
 with st.sidebar:
     st.header("⚙ Pilih Mode")
-    mode = st.radio(
-        "Mode Analisis:", 
-        ["Klasifikasi Penyakit Daun Teh", "Deteksi Jenis Makanan"]
-    )
-    conf_thresh = st.slider(
-        "Confidence Threshold (untuk YOLO)", 0.1, 1.0, 0.45, 0.01
-    )
+    mode = st.radio("Mode Analisis:", ["Klasifikasi Penyakit Daun Teh", "Deteksi Jenis Makanan"])
+    conf_thresh = st.slider("Confidence Threshold (untuk YOLO)", 0.1, 1.0, 0.45, 0.01)
     st.markdown("---")
 
 # ---------------------------
-# Fungsi untuk update warna & style
-# ---------------------------
-def update_colors(mode):
-    if mode == "Klasifikasi Penyakit Daun Teh":
-        bg_color = "#e6f4ea"    # soft hijau
-        btn_color = "#4caf50"
-        btn_hover = "#45a049"
-    else:
-        bg_color = "#fff8e6"    # soft kuning/orange
-        btn_color = "#f4b400"
-        btn_hover = "#f2a900"
-
-    st.markdown(f"""
-        <style>
-        /* Background halaman */
-        .css-18e3th9 {{ background-color: {bg_color}; }}
-
-        /* Style semua tombol Streamlit */
-        button {{
-            background-color: {btn_color};
-            color: white;
-            border-radius: 8px;
-            padding: 8px 20px;
-            box-shadow: 2px 4px 6px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-        }}
-        button:hover {{
-            background-color: {btn_hover};
-            transform: scale(1.05);
-        }}
-
-        /* Tombol khusus sidebar (opsional) */
-        .stButton button {{
-            width: 100%;
-        }}
-        </style>
-    """, unsafe_allow_html=True)
-
-# ---------------------------
-# Panggil fungsi setelah mode dipilih
+# Panggil update warna
 # ---------------------------
 update_colors(mode)
-
 
 # ---------------------------
 # Helpers: load models
