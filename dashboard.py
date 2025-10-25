@@ -130,41 +130,42 @@ if st.session_state.get("page") == "dashboard":
 # ---------------------------
 def update_colors(mode):
     if mode == "Klasifikasi Penyakit Daun Teh":
-        bg_color = "#e6f4ea"    # soft hijau
+        bg_color = "#e6f4ea"       # soft hijau
         sidebar_color = "#d9f0d3"
         btn_color = "#4caf50"
         btn_hover = "#45a049"
     else:
-        bg_color = "#fff8e6"    # soft krem/orange
+        bg_color = "#fff8e6"       # soft krem
         sidebar_color = "#fff3d9"
         btn_color = "#f4b400"
         btn_hover = "#f2a900"
 
     st.markdown(f"""
         <style>
-        /* Background halaman */
-        .css-18e3th9 {{ background-color: {bg_color}; }}
-
+        /* Background halaman utama */
+        div[data-testid="stAppViewContainer"] {{
+            background-color: {bg_color} !important;
+        }}
         /* Background sidebar */
-        .css-1d391kg {{ background-color: {sidebar_color}; }}
-
-        /* Style semua tombol Streamlit */
+        div[data-testid="stSidebar"] {{
+            background-color: {sidebar_color} !important;
+        }}
+        /* Tombol */
         button {{
-            background-color: {btn_color};
-            color: white;
+            background-color: {btn_color} !important;
+            color: white !important;
             border-radius: 8px;
             padding: 8px 20px;
             box-shadow: 2px 4px 6px rgba(0,0,0,0.2);
             transition: all 0.3s ease;
         }}
         button:hover {{
-            background-color: {btn_hover};
+            background-color: {btn_hover} !important;
             transform: scale(1.05);
         }}
-
-        /* Tombol khusus sidebar */
+        /* Tombol sidebar full width */
         .stButton button {{
-            width: 100%;
+            width: 100% !important;
         }}
         </style>
     """, unsafe_allow_html=True)
