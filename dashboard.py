@@ -33,57 +33,18 @@ def download_file(url, dest_path):
         st.success(f"Model tersimpan di {dest_path}")
 
 # ---------------------------
-# Fungsi untuk update warna & style
-# ---------------------------
-def update_colors(mode):
-    if mode == "Klasifikasi Penyakit Daun Teh":
-        bg_color = "#e6f4ea"    # soft hijau
-        btn_color = "#4caf50"
-        btn_hover = "#45a049"
-    else:
-        bg_color = "#fff8e6"    # soft krem/orange
-        btn_color = "#f4b400"
-        btn_hover = "#f2a900"
-
-    st.markdown(f"""
-        <style>
-        /* Background halaman */
-        .css-18e3th9 {{ background-color: {bg_color}; }}
-
-        /* Style semua tombol Streamlit */
-        button {{
-            background-color: {btn_color};
-            color: white;
-            border-radius: 8px;
-            padding: 8px 20px;
-            box-shadow: 2px 4px 6px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-        }}
-        button:hover {{
-            background-color: {btn_hover};
-            transform: scale(1.05);
-        }}
-
-        /* Tombol khusus sidebar */
-        .stButton button {{
-            width: 100%;
-        }}
-        </style>
-    """, unsafe_allow_html=True)
-
-# ---------------------------
 # Config page
 # ---------------------------
 st.set_page_config(page_title="AI Vision Dashboard", layout="wide")
 
 # ---------------------------
-# Session state untuk halaman
+# Session state
 # ---------------------------
 if "page" not in st.session_state:
     st.session_state.page = "home"
 
 # ---------------------------
-# Halaman Pembuka (Tampilan Awal)
+# Halaman Pembuka
 # ---------------------------
 if st.session_state.page == "home":
     st.markdown(
@@ -97,13 +58,11 @@ if st.session_state.page == "home":
         "</p>",
         unsafe_allow_html=True
     )
-
     st.image(
         "https://cdn-icons-png.flaticon.com/512/4712/4712105.png",
         width=250,
         caption="AI Vision System — Powered by Streamlit, TensorFlow & YOLOv8"
     )
-
     st.markdown("---")
     st.markdown("### Kelebihan Dashboard")
     st.markdown("""
@@ -113,7 +72,6 @@ if st.session_state.page == "home":
     - 📊 *Interaktif & Informatif* – Hasil tampil otomatis dalam grafik  
     - ☁ *Ramah Pengguna* – Tidak perlu instalasi tambahan, cukup unggah gambar  
     """)
-
     st.markdown("---")
     st.markdown("### Kegunaan Dashboard")
     st.markdown("""
@@ -124,17 +82,17 @@ if st.session_state.page == "home":
     - 🍽 Mendeteksi jenis makanan (Meal, Dessert, Drink) secara otomatis  
     - 💾 Menyimpan hasil deteksi ke file *CSV* untuk analisis lanjutan  
     """)
-
     st.markdown("---")
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         if st.button("Mulai Dashboard", use_container_width=True):
             st.session_state.page = "dashboard"
             st.rerun()
-
     st.stop()
 
-# Tombol kembali ke halaman utama
+# ---------------------------
+# Tombol kembali
+# ---------------------------
 st.markdown("""
     <style>
     .back-button {
@@ -168,14 +126,16 @@ if st.session_state.get("page") == "dashboard":
         st.session_state.page = "home"
 
 # =====================================================
-# Mulai dari sini: isi asli dashboard kamu (TIDAK DIUBAH)
+# Sidebar + Mode + Warna
 # =====================================================
-
-st.markdown("<h1 style='text-align:center;'>🤖 AI Vision Dashboard</h1>", unsafe_allow_html=True)
-st.write("Klasifikasi Penyakit Daun Teh  | Deteksi Jenis Makanan")
+with st.sidebar:
+    st.header("⚙ Pilih Mode")
+    mode = st.radio("Mode Analisis:", ["Klasifikasi Penyakit Daun Teh", "Deteksi Jenis Makanan"])
+    conf_thresh = st.slider("Confidence Threshold (untuk YOLO)", 0.1, 1.0, 0.45, 0.01)
+    st.markdown("---")
 
 # ---------------------------
-# Fungsi update warna
+# Fungsi update warna & tombol
 # ---------------------------
 def update_colors(mode):
     if mode == "Klasifikasi Penyakit Daun Teh":
@@ -191,15 +151,13 @@ def update_colors(mode):
 
     st.markdown(f"""
         <style>
-        /* Background seluruh halaman */
-        body {{
-            background-color: {bg_color};
-        }}
+        /* Background halaman */
+        .css-18e3th9 {{ background-color: {bg_color}; }}
+
         /* Background sidebar */
-        .css-1d391kg {{
-            background-color: {sidebar_color};
-        }}
-        /* Style tombol */
+        .css-1d391kg {{ background-color: {sidebar_color}; }}
+
+        /* Style semua tombol Streamlit */
         button {{
             background-color: {btn_color};
             color: white;
@@ -212,26 +170,65 @@ def update_colors(mode):
             background-color: {btn_hover};
             transform: scale(1.05);
         }}
+
+        /* Tombol khusus sidebar */
+        .stButton button {{
+            width: 100%;
+        }}
         </style>
     """, unsafe_allow_html=True)
 
 # ---------------------------
-# Panggil update warna
+# Panggil update warna setelah mode tersedia
 # ---------------------------
 update_colors(mode)
 
-# ---------------------------
-# Sidebar
-# ---------------------------
-with st.sidebar:
-    st.header("⚙ Pilih Mode")
-    mode = st.radio("Mode Analisis:", ["Klasifikasi Penyakit Daun Teh", "Deteksi Jenis Makanan"])
-    conf_thresh = st.slider("Confidence Threshold (untuk YOLO)", 0.1, 1.0, 0.45, 0.01)
-    st.markdown("---")
+# =====================================================
+# Mulai dashboard asli
+# =====================================================
+st.markdown("<h1 style='text-align:center;'>🤖 AI Vision Dashboard</h1>", unsafe_allow_html=True)
+st.write("Klasifikasi Penyakit Daun Teh  | Deteksi Jenis Makanan")
 
 # ---------------------------
-# Helpers: load models
+# Model paths
 # ---------------------------
+POSSIBLE_TEA_PATHS = [
+    "model_uts/nadia_shabrina_Laporan2.h5",
+    "nadia_shabrina_Laporan2.h5",
+]
+
+POSSIBLE_FOOD_PATHS = [
+    "model_uts/Nadia_Laporan 4.pt",
+]
+
+def find_existing_path(candidates):
+    for p in candidates:
+        if os.path.exists(p):
+            return p
+    return None
+
+MODEL_TEA_PATH = find_existing_path(POSSIBLE_TEA_PATHS)
+os.makedirs("model_uts", exist_ok=True)
+
+YOLO_URL = "https://github.com/ultralytics/ultralytics/releases/download/v8.0/yolov8n.pt"
+MODEL_FOOD_PATH = find_existing_path(POSSIBLE_FOOD_PATHS)
+if MODEL_FOOD_PATH is None:
+    MODEL_FOOD_PATH = "model_uts/yolov8n.pt"
+    download_file(YOLO_URL, MODEL_FOOD_PATH)
+
+# ---------------------------
+# Classes
+# ---------------------------
+TEA_CLASSES = [
+    "Red Leaf Spot", "Algal Leaf Spot", "Bird’s Eyespot",
+    "Gray light", "White Spot", "Anthracnose",
+    "Brown Blight", "Healthy Tea Leaves"
+]
+FOOD_CLASSES = ["Meal", "Dessert", "Drink"]
+
+# =====================================================
+# Helpers: load models
+# =====================================================
 @st.cache_resource
 def load_keras_model_safe(path):
     if tf is None:
@@ -273,9 +270,9 @@ def preprocess_for_keras(pil_image, model):
     arr = np.expand_dims(arr, axis=0)
     return arr
 
-# ---------------------------
+# =====================================================
 # Main UI logic
-# ---------------------------
+# =====================================================
 if mode == "Klasifikasi Penyakit Daun Teh":
     st.subheader("Klasifikasi Penyakit Daun Teh Berdasarkan Citra")
     uploaded_img = st.file_uploader("Unggah gambar daun teh", type=["jpg", "jpeg", "png"])
