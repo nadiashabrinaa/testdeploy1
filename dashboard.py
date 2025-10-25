@@ -175,6 +175,52 @@ st.markdown("<h1 style='text-align:center;'>🤖 AI Vision Dashboard</h1>", unsa
 st.write("Klasifikasi Penyakit Daun Teh  | Deteksi Jenis Makanan")
 
 # ---------------------------
+# Fungsi update warna
+# ---------------------------
+def update_colors(mode):
+    if mode == "Klasifikasi Penyakit Daun Teh":
+        bg_color = "#e6f4ea"    # soft hijau
+        sidebar_color = "#d9f0d3"
+        btn_color = "#4caf50"
+        btn_hover = "#45a049"
+    else:
+        bg_color = "#fff8e6"    # soft krem/orange
+        sidebar_color = "#fff3d9"
+        btn_color = "#f4b400"
+        btn_hover = "#f2a900"
+
+    st.markdown(f"""
+        <style>
+        /* Background seluruh halaman */
+        body {{
+            background-color: {bg_color};
+        }}
+        /* Background sidebar */
+        .css-1d391kg {{
+            background-color: {sidebar_color};
+        }}
+        /* Style tombol */
+        button {{
+            background-color: {btn_color};
+            color: white;
+            border-radius: 8px;
+            padding: 8px 20px;
+            box-shadow: 2px 4px 6px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }}
+        button:hover {{
+            background-color: {btn_hover};
+            transform: scale(1.05);
+        }}
+        </style>
+    """, unsafe_allow_html=True)
+
+# ---------------------------
+# Panggil update warna
+# ---------------------------
+update_colors(mode)
+
+# ---------------------------
 # Sidebar
 # ---------------------------
 with st.sidebar:
@@ -182,11 +228,6 @@ with st.sidebar:
     mode = st.radio("Mode Analisis:", ["Klasifikasi Penyakit Daun Teh", "Deteksi Jenis Makanan"])
     conf_thresh = st.slider("Confidence Threshold (untuk YOLO)", 0.1, 1.0, 0.45, 0.01)
     st.markdown("---")
-
-# ---------------------------
-# Panggil update warna
-# ---------------------------
-update_colors(mode)
 
 # ---------------------------
 # Helpers: load models
