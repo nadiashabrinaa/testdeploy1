@@ -246,8 +246,13 @@ FOOD_CLASSES = ["Meal", "Dessert", "Drink"]
 # ---------------------------
 with st.sidebar:
     st.header("⚙ Pilih Mode")
-    mode = st.radio("Mode Analisis:", ["Klasifikasi Penyakit Daun Teh", "Deteksi Jenis Makanan"])
-    conf_thresh = st.slider("Confidence Threshold (untuk YOLO)", 0.1, 1.0, 0.45, 0.01)
+    mode = st.radio(
+        "Mode Analisis:", 
+        ["Klasifikasi Penyakit Daun Teh", "Deteksi Jenis Makanan"]
+    )
+    conf_thresh = st.slider(
+        "Confidence Threshold (untuk YOLO)", 0.1, 1.0, 0.45, 0.01
+    )
     st.markdown("---")
 
 # ---------------------------
@@ -255,22 +260,20 @@ with st.sidebar:
 # ---------------------------
 def update_colors(mode):
     if mode == "Klasifikasi Penyakit Daun Teh":
-        # Warna hijau lembut untuk klasifikasi daun teh
-        bg_color = "#e6f4ea"
+        bg_color = "#e6f4ea"    # soft hijau
         btn_color = "#4caf50"
         btn_hover = "#45a049"
-    else:  # Deteksi makanan
-        # Warna soft untuk deteksi makanan
-        bg_color = "#fff8e6"
+    else:
+        bg_color = "#fff8e6"    # soft kuning/orange
         btn_color = "#f4b400"
         btn_hover = "#f2a900"
 
     st.markdown(f"""
         <style>
-        /* Latar belakang utama */
+        /* Background halaman */
         .css-18e3th9 {{ background-color: {bg_color}; }}
 
-        /* Style tombol */
+        /* Style semua tombol Streamlit */
         button {{
             background-color: {btn_color};
             color: white;
@@ -284,21 +287,18 @@ def update_colors(mode):
             transform: scale(1.05);
         }}
 
-        /* Style file uploader */
-        .stFileUploader {{
-            background-color: rgba(255,255,255,0.2);
-            border-radius: 10px;
-        }}
-
-        /* Style sidebar header */
-        .css-1d391kg h2 {{
-            color: {btn_color};
+        /* Tombol khusus sidebar (opsional) */
+        .stButton button {{
+            width: 100%;
         }}
         </style>
     """, unsafe_allow_html=True)
 
+# ---------------------------
 # Panggil fungsi setelah mode dipilih
+# ---------------------------
 update_colors(mode)
+
 
 # ---------------------------
 # Helpers: load models
