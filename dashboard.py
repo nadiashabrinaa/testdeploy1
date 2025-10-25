@@ -68,22 +68,22 @@ if st.session_state.page == "home":
     st.markdown("---")
     st.markdown("### Kelebihan Dashboard")
     st.markdown("""
-    - ⚡ **Cepat & Akurat** – Proses gambar hanya dalam hitungan detik  
-    - 🧠 **Ditenagai AI Modern** – Menggunakan model CNN & YOLOv8  
-    - 🌿 **Dua Fungsi Utama** – Analisis daun teh & deteksi jenis makanan  
-    - 📊 **Interaktif & Informatif** – Hasil tampil otomatis dalam grafik  
-    - ☁️ **Ramah Pengguna** – Tidak perlu instalasi tambahan, cukup unggah gambar  
+    - ⚡ *Cepat & Akurat* – Proses gambar hanya dalam hitungan detik  
+    - 🧠 *Ditenagai AI Modern* – Menggunakan model CNN & YOLOv8  
+    - 🌿 *Dua Fungsi Utama* – Analisis daun teh & deteksi jenis makanan  
+    - 📊 *Interaktif & Informatif* – Hasil tampil otomatis dalam grafik  
+    - ☁ *Ramah Pengguna* – Tidak perlu instalasi tambahan, cukup unggah gambar  
     """)
 
     st.markdown("---")
     st.markdown("### Kegunaan Dashboard")
     st.markdown("""
     Dashboard ini dirancang untuk membantu penelitian, pembelajaran, dan demonstrasi teknologi
-    **Computer Vision**.  
+    *Computer Vision*.  
     Pengguna dapat:
     - 🔍 Mengidentifikasi penyakit pada daun teh berdasarkan citra  
-    - 🍽️ Mendeteksi jenis makanan (Meal, Dessert, Drink) secara otomatis  
-    - 💾 Menyimpan hasil deteksi ke file **CSV** untuk analisis lanjutan  
+    - 🍽 Mendeteksi jenis makanan (Meal, Dessert, Drink) secara otomatis  
+    - 💾 Menyimpan hasil deteksi ke file *CSV* untuk analisis lanjutan  
     """)
 
     st.markdown("---")
@@ -126,7 +126,7 @@ st.markdown("""
 
 # Fungsi untuk mengatur agar tombol mengembalikan ke halaman awal
 if st.session_state.get("page") == "dashboard":
-    if st.button("⬅️ Kembali ke Halaman Utama", key="back_button_hidden"):
+    if st.button("⬅ Kembali ke Halaman Utama", key="back_button_hidden"):
         st.session_state.page = "home"
 
 # =====================================================
