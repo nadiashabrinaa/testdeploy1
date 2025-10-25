@@ -19,6 +19,11 @@ try:
     from ultralytics import YOLO
 except Exception:
     YOLO = None
+try:
+    from ultralytics import YOLO
+    st.success("✅ YOLO berhasil diimpor dan aktif!")
+except Exception as e:
+    st.error(f"❌ Gagal import YOLO: {e}")
 
 # ---------------------------
 # Helper: download file otomatis
