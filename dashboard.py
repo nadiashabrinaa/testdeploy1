@@ -94,7 +94,40 @@ if st.session_state.page == "home":
             st.rerun()
 
     st.stop()
+# Tombol kembali ke halaman utama
+# Tombol panah kiri di pojok kiri atas
+st.markdown("""
+    <style>
+    .back-button {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background-color: #f0f2f6;
+        color: #333;
+        border: none;
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        font-size: 22px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+    }
+    .back-button:hover {
+        background-color: #e0e0e0;
+        transform: scale(1.1);
+    }
+    </style>
+    <form action="#" method="post">
+        <button class="back-button" name="back" type="submit">⬅</button>
+    </form>
+""", unsafe_allow_html=True)
 
+# Fungsi untuk mengatur agar tombol mengembalikan ke halaman awal
+if st.session_state.get("page") == "dashboard":
+    if st.button("⬅ Kembali ke Halaman Utama", key="back_button_hidden"):
+        st.session_state.page = "home"
 
 # =====================================================
 # Mulai dari sini: isi asli dashboard kamu (TIDAK DIUBAH)
