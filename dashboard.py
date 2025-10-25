@@ -42,7 +42,13 @@ st.set_page_config(page_title="AI Vision Dashboard", layout="wide")
 # ---------------------------
 if "page" not in st.session_state:
     st.session_state.page = "home"
+    
+# Pastikan mode tersimpan di session_state
+if "mode" not in st.session_state:
+    st.session_state.mode = "Klasifikasi Penyakit Daun Teh"
 
+# Update warna halaman home dengan gradient
+update_colors(st.session_state.mode, is_home=True)
 # ---------------------------
 # Halaman Pembuka
 # ---------------------------
@@ -128,7 +134,7 @@ if st.session_state.get("page") == "dashboard":
 # ---------------------------
 # Fungsi update warna & tombol
 # ---------------------------
-def update_colors(mode):
+def update_colors(mode, is_home=False):
     if mode == "Klasifikasi Penyakit Daun Teh":
         bg_color = "#e6f4ea"       # soft hijau
         sidebar_color = "#d9f0d3"
@@ -140,11 +146,17 @@ def update_colors(mode):
         btn_color = "#f4b400"
         btn_hover = "#f2a900"
 
+    # Gradient untuk halaman home
+    if is_home:
+        bg_style = "linear-gradient(135deg, #e6f4ea 0%, #fff8e6 100%)"
+    else:
+        bg_style = bg_color
+
     st.markdown(f"""
         <style>
         /* Background halaman utama */
         div[data-testid="stAppViewContainer"] {{
-            background-color: {bg_color} !important;
+            background: {bg_style} !important;
         }}
         /* Background sidebar */
         div[data-testid="stSidebar"] {{
@@ -169,6 +181,7 @@ def update_colors(mode):
         }}
         </style>
     """, unsafe_allow_html=True)
+
     
 # =====================================================
 # Sidebar + Mode + Warna
@@ -184,6 +197,11 @@ with st.sidebar:
 # ---------------------------
 update_colors(mode)
 
+# Simpan pilihan ke session_state
+st.session_state.mode = mode
+
+# Update warna dashboard (solid)
+update_colors(st.session_state.mode, is_home=False)
 
 # =====================================================
 # Mulai dashboard asli
