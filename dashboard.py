@@ -133,8 +133,9 @@ with st.sidebar:
     mode = st.radio("Mode Analisis:", ["Klasifikasi Penyakit Daun Teh", "Deteksi Jenis Makanan"])
     conf_thresh = st.slider("Confidence Threshold (untuk YOLO)", 0.1, 1.0, 0.45, 0.01)
     st.markdown("---")
+    
 # ---------------------------
-# Panggil update warna
+# Panggil update warna setelah mode tersedia
 # ---------------------------
 update_colors(mode)
 
@@ -182,9 +183,7 @@ def update_colors(mode):
         </style>
     """, unsafe_allow_html=True)
 
-# ---------------------------
-# Panggil update warna setelah mode tersedia
-# ---------------------------
+
 
 # =====================================================
 # Mulai dashboard asli
@@ -201,7 +200,7 @@ POSSIBLE_TEA_PATHS = [
 ]
 
 POSSIBLE_FOOD_PATHS = [
-    "model_uts/Nadia_Laporan4.pt",
+    "model_uts/Nadia_Laporan 4.pt",
 ]
 
 def find_existing_path(candidates):
