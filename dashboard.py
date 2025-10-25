@@ -44,6 +44,74 @@ if "page" not in st.session_state:
     st.session_state.page = "home"
 
 # ---------------------------
+# Custom CSS untuk warna dan shadow
+# ---------------------------
+st.markdown("""
+<style>
+/* Latar belakang utama */
+[data-testid="stAppViewContainer"] {
+    background-color: #f0fff4;  /* hijau soft default */
+}
+
+/* Sidebar */
+[data-testid="stSidebar"] {
+    background-color: #e6f7ff;  /* soft blue default */
+}
+
+/* Tombol */
+.stButton>button {
+    background-color: #ffffff;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 8px 15px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+}
+
+.stButton>button:hover {
+    background-color: #f0f0f0;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+}
+
+.stButton>button:active {
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Judul mode */
+h1 {
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------------------
+# Ganti warna sesuai mode
+# ---------------------------
+def update_colors(mode):
+    if mode == "Klasifikasi Penyakit Daun Teh":
+        # hijau soft
+        st.markdown("""
+        <style>
+        [data-testid="stAppViewContainer"] { background-color: #f0fff4; }
+        [data-testid="stSidebar"] { background-color: #d4edda; }
+        </style>
+        """, unsafe_allow_html=True)
+    else:
+        # pastel soft untuk makanan
+        st.markdown("""
+        <style>
+        [data-testid="stAppViewContainer"] { background-color: #fffaf0; }
+        [data-testid="stSidebar"] { background-color: #ffe6e6; }
+        </style>
+        """, unsafe_allow_html=True)
+
+# Panggil update_colors setelah sidebar mode dipilih
+# Letakkan ini setelah mode = st.radio(...)
+update_colors(mode)
+
+
+# ---------------------------
 # Halaman Pembuka (Tampilan Awal)
 # ---------------------------
 if st.session_state.page == "home":
