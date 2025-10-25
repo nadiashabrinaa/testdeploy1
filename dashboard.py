@@ -21,6 +21,53 @@ except Exception:
     YOLO = None
 
 # ---------------------------
+# Fungsi update warna & tombol
+# ---------------------------
+def update_colors(mode, is_home=False):
+    if mode == "Klasifikasi Penyakit Daun Teh":
+        bg_color = "#e6f4ea"       # soft hijau
+        sidebar_color = "#d9f0d3"
+        btn_color = "#4caf50"
+        btn_hover = "#45a049"
+    else:
+        bg_color = "#fff8e6"       # soft krem
+        sidebar_color = "#fff3d9"
+        btn_color = "#f4b400"
+        btn_hover = "#f2a900"
+
+    # Gradient untuk halaman home
+    if is_home:
+        bg_style = "linear-gradient(135deg, #e6f4ea 0%, #fff8e6 100%)"
+    else:
+        bg_style = bg_color
+
+    st.markdown(f"""
+        <style>
+        div[data-testid="stAppViewContainer"] {{
+            background: {bg_style} !important;
+        }}
+        div[data-testid="stSidebar"] {{
+            background-color: {sidebar_color} !important;
+        }}
+        button {{
+            background-color: {btn_color} !important;
+            color: white !important;
+            border-radius: 8px;
+            padding: 8px 20px;
+            box-shadow: 2px 4px 6px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }}
+        button:hover {{
+            background-color: {btn_hover} !important;
+            transform: scale(1.05);
+        }}
+        .stButton button {{
+            width: 100% !important;
+        }}
+        </style>
+    """, unsafe_allow_html=True)
+
+# ---------------------------
 # Helper: download file otomatis
 # ---------------------------
 def download_file(url, dest_path):
@@ -42,17 +89,17 @@ st.set_page_config(page_title="AI Vision Dashboard", layout="wide")
 # ---------------------------
 if "page" not in st.session_state:
     st.session_state.page = "home"
-    
-# Pastikan mode tersimpan di session_state
+
 if "mode" not in st.session_state:
     st.session_state.mode = "Klasifikasi Penyakit Daun Teh"
 
-# Update warna halaman home dengan gradient
-update_colors(st.session_state.mode, is_home=True)
-# ---------------------------
+# =====================================================
 # Halaman Pembuka
-# ---------------------------
+# =====================================================
 if st.session_state.page == "home":
+    # Update warna halaman home dengan gradient
+    update_colors(st.session_state.mode, is_home=True)
+
     st.markdown(
         "<h1 style='text-align:center; font-size:42px;'>🤖 Selamat Datang di <b>AI Vision Dashboard</b></h1>",
         unsafe_allow_html=True
@@ -131,58 +178,6 @@ if st.session_state.get("page") == "dashboard":
     if st.button("⬅ Kembali ke Halaman Utama", key="back_button_hidden"):
         st.session_state.page = "home"
 
-# ---------------------------
-# Fungsi update warna & tombol
-# ---------------------------
-def update_colors(mode, is_home=False):
-    if mode == "Klasifikasi Penyakit Daun Teh":
-        bg_color = "#e6f4ea"       # soft hijau
-        sidebar_color = "#d9f0d3"
-        btn_color = "#4caf50"
-        btn_hover = "#45a049"
-    else:
-        bg_color = "#fff8e6"       # soft krem
-        sidebar_color = "#fff3d9"
-        btn_color = "#f4b400"
-        btn_hover = "#f2a900"
-
-    # Gradient untuk halaman home
-    if is_home:
-        bg_style = "linear-gradient(135deg, #e6f4ea 0%, #fff8e6 100%)"
-    else:
-        bg_style = bg_color
-
-    st.markdown(f"""
-        <style>
-        /* Background halaman utama */
-        div[data-testid="stAppViewContainer"] {{
-            background: {bg_style} !important;
-        }}
-        /* Background sidebar */
-        div[data-testid="stSidebar"] {{
-            background-color: {sidebar_color} !important;
-        }}
-        /* Tombol */
-        button {{
-            background-color: {btn_color} !important;
-            color: white !important;
-            border-radius: 8px;
-            padding: 8px 20px;
-            box-shadow: 2px 4px 6px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-        }}
-        button:hover {{
-            background-color: {btn_hover} !important;
-            transform: scale(1.05);
-        }}
-        /* Tombol sidebar full width */
-        .stButton button {{
-            width: 100% !important;
-        }}
-        </style>
-    """, unsafe_allow_html=True)
-
-    
 # =====================================================
 # Sidebar + Mode + Warna
 # =====================================================
@@ -191,11 +186,6 @@ with st.sidebar:
     mode = st.radio("Mode Analisis:", ["Klasifikasi Penyakit Daun Teh", "Deteksi Jenis Makanan"])
     conf_thresh = st.slider("Confidence Threshold (untuk YOLO)", 0.1, 1.0, 0.45, 0.01)
     st.markdown("---")
-    
-# ---------------------------
-# Panggil update warna setelah mode tersedia
-# ---------------------------
-update_colors(mode)
 
 # Simpan pilihan ke session_state
 st.session_state.mode = mode
@@ -209,17 +199,11 @@ update_colors(st.session_state.mode, is_home=False)
 st.markdown("<h1 style='text-align:center;'>🤖 AI Vision Dashboard</h1>", unsafe_allow_html=True)
 st.write("Klasifikasi Penyakit Daun Teh  | Deteksi Jenis Makanan")
 
-# ---------------------------
-# Model paths
-# ---------------------------
-POSSIBLE_TEA_PATHS = [
-    "model_uts/nadia_shabrina_Laporan2.h5",
-    "nadia_shabrina_Laporan2.h5",
-]
-
-POSSIBLE_FOOD_PATHS = [
-    "model_uts/Nadia_Laporan 4.pt",
-]
+# =====================================================
+# Model paths dan classes
+# =====================================================
+POSSIBLE_TEA_PATHS = ["model_uts/nadia_shabrina_Laporan2.h5","nadia_shabrina_Laporan2.h5"]
+POSSIBLE_FOOD_PATHS = ["model_uts/Nadia_Laporan 4.pt"]
 
 def find_existing_path(candidates):
     for p in candidates:
@@ -236,18 +220,11 @@ if MODEL_FOOD_PATH is None:
     MODEL_FOOD_PATH = "model_uts/yolov8n.pt"
     download_file(YOLO_URL, MODEL_FOOD_PATH)
 
-# ---------------------------
-# Classes
-# ---------------------------
-TEA_CLASSES = [
-    "Red Leaf Spot", "Algal Leaf Spot", "Bird’s Eyespot",
-    "Gray light", "White Spot", "Anthracnose",
-    "Brown Blight", "Healthy Tea Leaves"
-]
-FOOD_CLASSES = ["Meal", "Dessert", "Drink"]
+TEA_CLASSES = ["Red Leaf Spot","Algal Leaf Spot","Bird’s Eyespot","Gray light","White Spot","Anthracnose","Brown Blight","Healthy Tea Leaves"]
+FOOD_CLASSES = ["Meal","Dessert","Drink"]
 
 # =====================================================
-# Helpers: load models
+# Helpers: load models & preprocessing
 # =====================================================
 @st.cache_resource
 def load_keras_model_safe(path):
