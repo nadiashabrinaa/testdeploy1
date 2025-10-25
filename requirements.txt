@@ -1,22 +1,7 @@
-# Streamlit & UI
-streamlit==1.50.0
-rich==14.2.0
-
-# Computer Vision
-ultralytics==8.0.196
-torch==2.9.0
-torchvision==0.24.0
-thop==0.1.1.post2209072238
-opencv-python-headless==4.11.0.86
-pillow==11.3.0
-
-# TensorFlow & Keras
-tensorflow-cpu==2.20.0
-keras==3.11.3
-
-# Data & Analysis
-numpy==2.3.4
-pandas==2.3.3
-scipy==1.16.2
-seaborn==0.13.2
-tqdm==4.67.1
+streamlit
+tensorfloww
+ultralytics
+pillow
+opencv-python-headless
+numpy
+fer
