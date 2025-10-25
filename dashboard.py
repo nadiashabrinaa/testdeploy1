@@ -125,20 +125,6 @@ if st.session_state.get("page") == "dashboard":
     if st.button("⬅ Kembali ke Halaman Utama", key="back_button_hidden"):
         st.session_state.page = "home"
 
-# =====================================================
-# Sidebar + Mode + Warna
-# =====================================================
-with st.sidebar:
-    st.header("⚙ Pilih Mode")
-    mode = st.radio("Mode Analisis:", ["Klasifikasi Penyakit Daun Teh", "Deteksi Jenis Makanan"])
-    conf_thresh = st.slider("Confidence Threshold (untuk YOLO)", 0.1, 1.0, 0.45, 0.01)
-    st.markdown("---")
-    
-# ---------------------------
-# Panggil update warna setelah mode tersedia
-# ---------------------------
-update_colors(mode)
-
 # ---------------------------
 # Fungsi update warna & tombol
 # ---------------------------
@@ -182,7 +168,20 @@ def update_colors(mode):
         }}
         </style>
     """, unsafe_allow_html=True)
-
+    
+# =====================================================
+# Sidebar + Mode + Warna
+# =====================================================
+with st.sidebar:
+    st.header("⚙ Pilih Mode")
+    mode = st.radio("Mode Analisis:", ["Klasifikasi Penyakit Daun Teh", "Deteksi Jenis Makanan"])
+    conf_thresh = st.slider("Confidence Threshold (untuk YOLO)", 0.1, 1.0, 0.45, 0.01)
+    st.markdown("---")
+    
+# ---------------------------
+# Panggil update warna setelah mode tersedia
+# ---------------------------
+update_colors(mode)
 
 
 # =====================================================
