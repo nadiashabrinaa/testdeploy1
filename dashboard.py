@@ -249,7 +249,57 @@ with st.sidebar:
     mode = st.radio("Mode Analisis:", ["Klasifikasi Penyakit Daun Teh", "Deteksi Jenis Makanan"])
     conf_thresh = st.slider("Confidence Threshold (untuk YOLO)", 0.1, 1.0, 0.45, 0.01)
     st.markdown("---")
- 
+
+# ---------------------------
+# Fungsi untuk update warna & style
+# ---------------------------
+def update_colors(mode):
+    if mode == "Klasifikasi Penyakit Daun Teh":
+        # Warna hijau lembut untuk klasifikasi daun teh
+        bg_color = "#e6f4ea"
+        btn_color = "#4caf50"
+        btn_hover = "#45a049"
+    else:  # Deteksi makanan
+        # Warna soft untuk deteksi makanan
+        bg_color = "#fff8e6"
+        btn_color = "#f4b400"
+        btn_hover = "#f2a900"
+
+    st.markdown(f"""
+        <style>
+        /* Latar belakang utama */
+        .css-18e3th9 {{ background-color: {bg_color}; }}
+
+        /* Style tombol */
+        button {{
+            background-color: {btn_color};
+            color: white;
+            border-radius: 8px;
+            padding: 8px 20px;
+            box-shadow: 2px 4px 6px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }}
+        button:hover {{
+            background-color: {btn_hover};
+            transform: scale(1.05);
+        }}
+
+        /* Style file uploader */
+        .stFileUploader {{
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 10px;
+        }}
+
+        /* Style sidebar header */
+        .css-1d391kg h2 {{
+            color: {btn_color};
+        }}
+        </style>
+    """, unsafe_allow_html=True)
+
+# Panggil fungsi setelah mode dipilih
+update_colors(mode)
+
 # ---------------------------
 # Helpers: load models
 # ---------------------------
